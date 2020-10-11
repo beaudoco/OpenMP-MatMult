@@ -7,6 +7,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <omp.h>
+#include <time.h>
 using namespace std;
 
 void read_matrix(int*, int, char*);
@@ -30,12 +31,34 @@ int main (int argc, char *argv[])
 	int *B = new int[dim * dim];
 	int *C = new int[dim * dim];
 
+	//SETUP TIMER FOR FILE
+    struct timespec begin, end;
+    clock_gettime(CLOCK_REALTIME, &begin);
 	// input A and B matrices
 	read_matrix(A, dim, argv[2]);
 	read_matrix(B, dim, argv[3]);
 
+	//END CLOCK AND GET TIME
+    clock_gettime(CLOCK_REALTIME, &end);
+    long seconds = end.tv_sec - begin.tv_sec;
+    long nanoseconds = end.tv_nsec - begin.tv_nsec;
+    double elapsed = seconds + nanoseconds*1e-9;
+
+    printf("sequential time taken %f\n",elapsed);
+
+	//SETUP TIMER FOR FILE
+    struct timespec begin2, end2;
+    clock_gettime(CLOCK_REALTIME, &begin2);
 	// compute product using straightforward algorithm
 	matmult (C, A, B, dim);
+
+	//END CLOCK AND GET TIME
+    clock_gettime(CLOCK_REALTIME, &end2);
+    long seconds2 = end2.tv_sec - begin2.tv_sec;
+    long nanoseconds2 = end2.tv_nsec - begin2.tv_nsec;
+    double elapsed2 = seconds2 + nanoseconds2*1e-9;
+
+    printf("parallel time taken %f\n",elapsed2);
 
 	// check results
 	print_matrix (C, dim);
